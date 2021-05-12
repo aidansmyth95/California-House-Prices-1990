@@ -66,11 +66,12 @@ class CombinedAttributesAdder(BaseEstimator, TransformerMixin):
             return np.c_[X, rooms_per_household, population_per_household]
 
 
-if __name__ == '__main__':
+def prepare_data():
 
     # read saved train data
     print('\nLoading train data...')
     strat_train_set = pd.read_pickle("train_data.pkl")
+    strat_test_set = pd.read_pickle("test_data.pkl")
     print(strat_train_set.head(5))
 
     #***********************************************
@@ -194,4 +195,19 @@ if __name__ == '__main__':
     print(housing_prepared)
     print(housing_prepared.shape)
 
+    # save NumPy array data for training
+    np.save('train_data_prepared', housing_prepared)
+    np.save('train_labels', housing_labels)
+
+
+    # pass test data through pipeline too
+    X_test = strat_test_set.drop("median_house_value", axis=1)
+    y_test = strat_test_set["median_house_value"].copy()
+    X_test_prepared = full_pipeline.transform(X_test)
+    np.save('X_test', X_test_prepared)
+    np.save('y_test', y_test)
+
     print('\nData is ML ready!')
+
+if __name__ == '__main__':
+    prepare_data()
